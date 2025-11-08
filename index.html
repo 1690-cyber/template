@@ -1,55 +1,176 @@
 <!DOCTYPE html>
-<ht lang="en">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POratikum CRUD JavaScript DOM</title>
-   <link rel="stylesheet" href="css/bootstrap.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRUD JavaScript DOM</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
 </head>
- <body>
+<body class="p-4">
 
-    <h2>Modul CRUD Sederhana</h2>
-    <nav class="navbar bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand"></a>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-            </div>
-            </nav>
-            <!-- From untuk Input Data  -->
-            
-            <hr><br> 
-            <div>
-                <label>Nama:</label>
-                <input type="text" id="name" required/><br />
-        <label>Email:</label>
-        <input type="email"  id="email" required/><br />
-        <label>password:</label>
-        <input type="password" id="password" required /><br />
-        <label>nik</label>
-        <input type="nik" id="nik" required /><br />
-        <button onclick="ubahTeks()">Simpan</button>
+  <h2 class="text-center mb-4">Modul CRUD Sederhana</h2>
+
+  <!-- Navbar Pencarian -->
+  <nav class="navbar bg-body-tertiary mb-3">
+    <div class="container-fluid">
+      <form class="d-flex" role="search" id="searchForm">
+        <input id="searchInput" class="form-control me-2" type="search" placeholder="Cari Nama / Email / NIK" aria-label="Search" />
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
     </div>
-    <hr>
-    <h3>Data Pengguna</h3>
-    <table border="1" id="userTable">
-        <thead>
-            <tr>
-                <th>NO</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>password</th>
-                <th>Aksi</th>
-                <th>Nik</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
-    </form>
+  </nav>
+
+  <!-- Form Input Data -->
+  <div class="card p-3 mb-4">
+    <label>Nama:</label>
+    <input type="text" id="name" class="form-control" required /><br />
+    <label>Email:</label>
+    <input type="email" id="email" class="form-control" required /><br />
+    <label>Password:</label>
+    <input type="password" id="password" class="form-control" required /><br />
+    <label>NIK:</label>
+    <input type="text" id="nik" class="form-control" required /><br />
+   <button class="btn btn-primary" id="simpanBtn" onclick="tambahData()" style="width: 120px;">Simpan</button>
+    <button class="btn btn-success d-none" id="updateBtn" onclick="updateData()">Update</button>
+    <button class="btn btn-secondary d-none" id="cancelBtn" onclick="batalEdit()">Batal</button>
   </div>
-  <script src="script.js"></script>
-  <script src="js/bootstrap.bundle.js"></script>
-    </body>
+
+  <hr />
+
+  <!-- Tabel Data -->
+  <h3>Data Pengguna</h3>
+  <table class="table table-bordered" id="userTable">
+    <thead class="table-secondary">
+      <tr>
+        <th>No</th>
+        <th>Nama</th>
+        <th>Email</th>
+        <th>Password</th>
+        <th>NIK</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    let dataUser = [];
+    let editIndex = -1;
+
+    // tambahin data
+    function tambahData() {
+      const nama = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const nik = document.getElementById("nik").value;
+
+      if (!nama || !email || !password || !nik) {
+        alert("Semua field harus diisi!");
+        return;
+      }
+
+      dataUser.push({ nama, email, password, nik });
+      tampilkanData(dataUser);
+      resetForm();
+    }
+
+    // delete data
+    function hapusData(index) {
+      if (confirm("Yakin ingin menghapus data ini?")) {
+        dataUser.splice(index, 1);
+        tampilkanData(dataUser);
+      }
+    }
+
+    // edit data
+    function editData(index) {
+      const user = dataUser[index];
+      document.getElementById("name").value = user.nama;
+      document.getElementById("email").value = user.email;
+      document.getElementById("password").value = user.password;
+      document.getElementById("nik").value = user.nik;
+
+      editIndex = index;
+
+      // ubah tombol ( simpan -> update & bata)
+      document.getElementById("simpanBtn").classList.add("d-none");
+      document.getElementById("updateBtn").classList.remove("d-none");
+      document.getElementById("cancelBtn").classList.remove("d-none");
+    }
+
+    // update data
+    function updateData() {
+      const nama = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const nik = document.getElementById("nik").value;
+
+      if (!nama || !email || !password || !nik) {
+        alert("Semua field harus diisi!");
+        return;
+      }
+
+      dataUser[editIndex] = { nama, email, password, nik };
+      tampilkanData(dataUser);
+      resetForm();
+      batalEdit();
+    }
+
+    // batal edit
+    function batalEdit() {
+      resetForm();
+      document.getElementById("simpanBtn").classList.remove("d-none");
+      document.getElementById("updateBtn").classList.add("d-none");
+      document.getElementById("cancelBtn").classList.add("d-none");
+      editIndex = -1;
+    }
+
+    // reset form
+    function resetForm() {
+      document.getElementById("name").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("nik").value = "";
+    }
+
+    // tampilkan data di tabel
+    function tampilkanData(list) {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+
+      list.forEach((user, index) => {
+        const row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${user.nama}</td>
+            <td>${user.email}</td>
+            <td>${user.password}</td>
+            <td>${user.nik}</td>
+            <td>
+              <button class="btn btn-warning btn-sm" onclick="editData(${index})">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="hapusData(${index})">Hapus</button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    // search data
+    document.getElementById("searchForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const keyword = document.getElementById("searchInput").value.toLowerCase();
+
+      const hasil = dataUser.filter(user =>
+        user.nama.toLowerCase().includes(keyword) ||
+        user.email.toLowerCase().includes(keyword) ||
+        user.nik.toLowerCase().includes(keyword)
+      );
+
+      tampilkanData(hasil);
+    });
+  </script>
+
+  <script src="js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
